@@ -1,0 +1,53 @@
+name: Weekly Scraper Cron Job
+on:
+  # Triggers the workflow after every 7 days
+  schedule:
+    - cron: '0 0 * * 1'
+  #  - cron: '*/5 * * * *'
+
+  workflow_dispatch:
+
+jobs:
+  Send-Email:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20.x'
+
+      - uses: pnpm/action-setup@v3
+        name: Install pnpm
+        with:
+          version: 8
+          run_install: false
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - uses: actions/cache@v3
+        name: Setup pnpm cache
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Set Up ENV Variable
+        run: |
+          echo USER_NAME=${{ secrets.USER_NAME }} >> .env
+          echo PASSWORD=${{ secrets.PASSWORD }} >> .env
+          echo GMAIL_ID=${{ secrets.GMAIL_ID }} >> .env
+          echo GMAIL_PASS=${{ secrets.GMAIL_PASS }} >> .env
+          echo RECIVER_EMAIL=${{ secrets.RECIVER_EMAIL }} >> .env
+
+      - name: Scrape and Send Email
+        run: node index.js
