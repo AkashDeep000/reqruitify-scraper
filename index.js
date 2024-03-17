@@ -79,8 +79,8 @@ function getLocationsObj(locations) {
     const arr = [];
     arr.push(locations[i]?.city);
     arr.push(locations[i]?.state);
-    arr.push(locations[i]?.country);
-    arr.push(locations[i]?.postal_code);
+    // arr.push(locations[i]?.country);
+    // arr.push(locations[i]?.postal_code);
 
     obj["LOCATION " + i] = arr.filter((item) => item?.length > 0).join(`, `);
   }
