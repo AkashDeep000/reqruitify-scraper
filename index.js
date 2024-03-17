@@ -37,6 +37,7 @@ const jobsRes = await fetch(
 );
 
 const jobsUnfiltered = (await jobsRes.json()).data;
+console.log(jobsUnfiltered.length);
 const jobs = jobsUnfiltered.filter(
   (item) =>
     item?.attributes?.submitted_to == false &&
@@ -53,7 +54,7 @@ const getJobsDetailsPromise = jobs.map((job) =>
       "https://my.recruitifi.com/api/v3/recruiter/requests/" + job.id,
       { ...reqArgs },
     );
-    const jobDetails = (await jobRes.json()).included[0].attributes;
+    const jobDetails = (await jobRes.json());
     // log({
     //   activeRequest: limit.activeCount,
     //   pendingRequest: limit.pendingCount,
@@ -66,8 +67,9 @@ const jobsDetails = await Promise.all(getJobsDetailsPromise);
 
 let maxLocationCount = 0;
 jobsDetails.forEach((job) => {
-  if (maxLocationCount < job.locations.length)
-    maxLocationCount = job.locations.length;
+  console.log(job);
+  if (maxLocationCount < job.included[0].attributes.locations.length)
+    maxLocationCount = job.included[0].attributes.locations.length;
 });
 log({ maxLocationCount });
 
@@ -111,20 +113,24 @@ console.log({
 const filteredData = jobsDetails.filter((job) =>
   process.env.GET_ALL
     ? true
-    : date.subtract(startDate, new Date(job.created_at)).toMilliseconds() <= 0,
+    : date.subtract(startDate, new Date(job.included[0].attributes.created_at)).toMilliseconds() <= 0,
 );
 
+
 const dateSet = new Set(
-  filteredData.map((job) => job.created_at.split("T")[0]),
+  filteredData.map((job) => job.included[0].attributes.created_at.split("T")[0]),
 );
 console.log(dateSet);
 
-const JobsDetailsFormated = filteredData.map((job) => {
+const JobsDetailsFormated = filteredData.map((jobDetail) => {
+  const job = jobDetail.included[0].attributes
   const locations = getLocationsObj(job.locations);
   return {
     "CREATED AT": job.created_at.split("T")[0],
     "ORGANIZATION NAME": job.organization_name,
     TITLE: job.title,
+    "EST. Earnings": 0.01 * job.salary_max_cents * jobDetail.data.attributes.fee_option.fee_percentage,
+    "PRIORITY_BONUS": job.current_priority_bonus?.amount,
     "JOBCAST ID": job.jobcast_identifier,
     LEVEL: job.level,
     "REPORTS TO": job.reports_to || " ",
