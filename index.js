@@ -129,7 +129,7 @@ const JobsDetailsFormated = filteredData.map((jobDetail) => {
     "ORGANIZATION NAME": job.organization_name,
     TITLE: job.title,
     "EST. Earnings": 0.01 * job.salary_max_cents * jobDetail.data.attributes.fee_option.fee_percentage,
-    "PRIORITY_BONUS": job.current_priority_bonus?.amount,
+    "PRIORITY_BONUS": job.current_priority_bonus?.amount || "N/A",
     "JOBCAST ID": job.jobcast_identifier,
     LEVEL: job.level,
     "REPORTS TO": job.reports_to || " ",
