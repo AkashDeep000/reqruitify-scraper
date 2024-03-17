@@ -155,7 +155,7 @@ const JobsDetailsFormated = filteredData.map((jobDetail) => {
   };
 });
 
-log("Last 7 day - " + JobsDetailsFormated.length + " new job");
+log(JobsDetailsFormated.length + " new job");
 
 const opts = {};
 const transformOpts = {};
