@@ -37,7 +37,7 @@ const jobsRes = await fetch(
 );
 
 const jobsUnfiltered = (await jobsRes.json()).data;
-console.log(jobsUnfiltered.length);
+
 const jobs = jobsUnfiltered.filter(
   (item) =>
     item?.attributes?.submitted_to == false &&
@@ -67,7 +67,6 @@ const jobsDetails = await Promise.all(getJobsDetailsPromise);
 
 let maxLocationCount = 0;
 jobsDetails.forEach((job) => {
-  console.log(job);
   if (maxLocationCount < job.included[0].attributes.locations.length)
     maxLocationCount = job.included[0].attributes.locations.length;
 });
